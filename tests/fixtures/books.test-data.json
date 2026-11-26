@@ -1,0 +1,23 @@
+{
+  "baselineRead": [
+    {
+      "id": "baseline-atomic-habits",
+      "title": "Atomic Habits",
+      "author": "James Clear",
+      "genre": "Self Development",
+      "featured": false,
+      "expectedVisible": true
+    }
+  ],
+  "positiveMutation": [
+    {
+      "id": "qa-pragmatic-programmer",
+      "title": "The Pragmatic Programmer",
+      "author": "Andrew Hunt",
+      "genre": "Programming",
+      "featured": true,
+      "expectedVisible": true
+    }
+  ],
+  "negativeSecretChecks": ["STORE_ADMIN_KEY"]
+}

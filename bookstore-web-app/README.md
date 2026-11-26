@@ -22,3 +22,11 @@ node resetDemo.js
 
 This restores the three starter books and changes the banner back to `Version 1.0 - Baseline`.
 Documentation files are preserved.
+<!-- DOC-SYNC-START -->
+## Generated API Overview
+
+| Method | Path | Source |
+| --- | --- | --- |
+| GET | /api/books | server.js |
+| POST | /api/books | server.js |
+<!-- DOC-SYNC-END -->

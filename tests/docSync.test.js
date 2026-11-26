@@ -35,8 +35,15 @@ test("recursively discovers JavaScript and extracts documented functions and rou
        */
       function findBook(id) {}
       module.exports = { findBook };
+      /** Searches the catalog.
+       * @param {string} term Search term
+       * @returns {Array} Matching books
+       */
+      export const searchBooks = (term) => [];
       app.get("/api/books", findBook);
       if (request.method === "POST" && url.pathname === "/api/books") {}
+      router.put("/api/books/:id", updateBook);
+      router.delete("/api/books/:id", deleteBook);
       `,
     );
     fs.writeFileSync(path.join(folder, "public", "app.js"), "function renderBooks() {}");
@@ -53,8 +60,12 @@ test("recursively discovers JavaScript and extracts documented functions and rou
     assert.match(docs.apiDocs, /findBook/);
     assert.match(docs.apiDocs, /Book identifier/);
     assert.match(docs.apiDocs, /Matching book/);
+    assert.match(docs.apiDocs, /searchBooks/);
+    assert.match(docs.apiDocs, /Search term/);
     assert.match(docs.apiDocs, /GET \| \/api\/books/);
     assert.match(docs.apiDocs, /POST \| \/api\/books/);
+    assert.match(docs.apiDocs, /PUT \| \/api\/books\/:id/);
+    assert.match(docs.apiDocs, /DELETE \| \/api\/books\/:id/);
   });
 });
 
@@ -74,10 +85,44 @@ test("replaces only generated marker content and preserves surrounding notes", (
   });
 });
 
-test("skips existing documents without valid markers", () => {
+test("appends a generated marker block to existing markerless documents", () => {
   withTempFolder((folder) => {
     const file = path.join(folder, "README.md");
     const original = "# Human README\nKeep all notes.";
+    fs.writeFileSync(file, original);
+    const result = renderDocument(file, "README", "generated");
+    assert.equal(result.status, "updated");
+    assert.ok(result.content.startsWith(original));
+    assert.match(
+      result.content.slice(original.length),
+      /^\n\n<!-- DOC-SYNC-START -->\ngenerated\n<!-- DOC-SYNC-END -->\n$/,
+    );
+    fs.writeFileSync(file, result.content);
+    const rerun = renderDocument(file, "README", "updated");
+    assert.ok(rerun.content.startsWith(original));
+    assert.equal((rerun.content.match(/<!-- DOC-SYNC-START -->/g) || []).length, 1);
+    assert.match(rerun.content, /<!-- DOC-SYNC-START -->\nupdated\n<!-- DOC-SYNC-END -->/);
+  });
+});
+
+test("preserves CRLF content when initializing a markerless document", () => {
+  withTempFolder((folder) => {
+    const file = path.join(folder, "README.md");
+    const original = "# Human README\r\nKeep all notes.\r\n";
+    fs.writeFileSync(file, original);
+    const result = renderDocument(file, "README", "generated");
+    assert.ok(result.content.startsWith(original));
+    assert.match(
+      result.content.slice(original.length),
+      /^\r\n<!-- DOC-SYNC-START -->\r\ngenerated\r\n<!-- DOC-SYNC-END -->\r\n$/,
+    );
+  });
+});
+
+test("skips existing documents with malformed marker pairs", () => {
+  withTempFolder((folder) => {
+    const file = path.join(folder, "README.md");
+    const original = "# Human README\n<!-- DOC-SYNC-START -->\npartial";
     fs.writeFileSync(file, original);
     const result = renderDocument(file, "README", "generated");
     assert.equal(result.status, "skipped");
@@ -96,10 +141,10 @@ test("creates missing documents with starter title and marker pair", () => {
 
 test("redacts configured secrets without retaining their values", () => {
   const result = redactSensitive(
-    'const DB_PASSWORD = "db-private"; const JWT_SECRET=\'jwt-private\'; API_TOKEN: "api-private"',
+    'const DB_PASSWORD = "db-private"; const STORE_ADMIN_KEY="store-private"; const JWT_SECRET=\'jwt-private\'; API_TOKEN: "api-private"',
   );
-  assert.equal(result, 'const DB_PASSWORD = "[REDACTED]"; const JWT_SECRET="[REDACTED]"; API_TOKEN: "[REDACTED]"');
-  for (const secret of ["db-private", "jwt-private", "api-private"]) {
+  assert.equal(result, 'const DB_PASSWORD = "[REDACTED]"; const STORE_ADMIN_KEY="[REDACTED]"; const JWT_SECRET="[REDACTED]"; API_TOKEN: "[REDACTED]"');
+  for (const secret of ["db-private", "store-private", "jwt-private", "api-private"]) {
     assert.equal(result.includes(secret), false);
   }
 });
@@ -127,7 +172,7 @@ test("secret values are absent from generated docs and CLI output", () => {
     fs.writeFileSync(
       path.join(folder, "secret.js"),
       `/** Uses DB_PASSWORD=private-db-value.
-       * @returns {string} Token JWT_SECRET: "private-jwt-value"
+       * @returns {string} Token JWT_SECRET: "private-jwt-value"; STORE_ADMIN_KEY: "private-store-value"
        */
       export function readSecret() {}
       const API_TOKEN = "private-api-value";
@@ -136,7 +181,12 @@ test("secret values are absent from generated docs and CLI output", () => {
     const result = spawnSync(process.execPath, [cliPath, folder], { encoding: "utf8" });
     assert.equal(result.status, 0, result.stderr);
     const docs = fs.readFileSync(path.join(folder, "API_DOCS.md"), "utf8");
-    for (const secret of ["private-db-value", "private-jwt-value", "private-api-value"]) {
+    for (const secret of [
+      "private-db-value",
+      "private-jwt-value",
+      "private-api-value",
+      "private-store-value",
+    ]) {
       assert.equal(docs.includes(secret), false);
       assert.equal(result.stdout.includes(secret), false);
       assert.equal(result.stderr.includes(secret), false);

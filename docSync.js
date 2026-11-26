@@ -6,7 +6,7 @@ const path = require("node:path");
 const DEFAULT_TARGET = path.join(__dirname, "bookstore-web-app");
 const START_MARKER = "<!-- DOC-SYNC-START -->";
 const END_MARKER = "<!-- DOC-SYNC-END -->";
-const SECRET_KEYS = ["DB_PASSWORD", "JWT_SECRET", "API_TOKEN"];
+const SECRET_KEYS = ["DB_PASSWORD", "STORE_ADMIN_KEY", "JWT_SECRET", "API_TOKEN"];
 const EXCLUDED_DIRECTORIES = new Set([".git", "node_modules"]);
 const HTTP_METHODS = new Set(["GET", "POST", "PUT", "DELETE"]);
 
@@ -215,6 +215,19 @@ function renderDocument(filePath, title, generatedContent) {
   const original = fs.readFileSync(filePath, "utf8");
   const startIndex = original.indexOf(START_MARKER);
   const endIndex = original.indexOf(END_MARKER);
+  if (startIndex === -1 && endIndex === -1) {
+    const lineEnding = original.includes("\r\n") ? "\r\n" : "\n";
+    const hasBlankLine = /(?:\r?\n){2}$/.test(original);
+    let separator = "";
+    if (original.length > 0 && !hasBlankLine) {
+      separator = original.endsWith("\n") ? lineEnding : `${lineEnding}${lineEnding}`;
+    }
+    const generated = generatedContent.replace(/\r?\n/g, lineEnding);
+    return {
+      status: "updated",
+      content: `${original}${separator}${START_MARKER}${lineEnding}${generated}${lineEnding}${END_MARKER}${lineEnding}`,
+    };
+  }
   if (
     startIndex === -1 ||
     endIndex === -1 ||

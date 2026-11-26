@@ -7,6 +7,13 @@ const path = require("node:path");
 const { execFileSync } = require("node:child_process");
 
 const MERMAID_FENCE = /^```mermaid[ \t]*\r?\n([\s\S]*?)^```[ \t]*$/gm;
+const HTML_ENTITIES = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+};
 
 function loadEnvFile(filePath) {
   if (!fs.existsSync(filePath)) return;
@@ -92,12 +99,7 @@ function getConfig() {
 }
 
 function escapeHtml(value) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+  return value.replace(/[&<>"']/g, (character) => HTML_ENTITIES[character]);
 }
 
 function inlineMarkdown(value) {
@@ -304,6 +306,24 @@ async function api(config, method, pageId, payload) {
   return { ...result.data, _httpStatus: result.status };
 }
 
+async function findExistingPage(config, title, spaceKey) {
+  const query = new URLSearchParams({
+    title,
+    spaceKey,
+    type: "page",
+    status: "current",
+  });
+  const result = await request(config, "GET", `content?${query}`);
+  if (!Array.isArray(result.data.results)) {
+    throw new Error("Confluence page search returned an invalid response.");
+  }
+  const matches = result.data.results.filter((page) => page.title === title);
+  if (matches.length > 1) {
+    throw new Error(`Multiple current pages titled "${title}" were found in space ${spaceKey}.`);
+  }
+  return matches[0];
+}
+
 async function uploadAttachment(config, pageId, diagram) {
   const pagePath = `content/${encodeURIComponent(pageId)}/child/attachment`;
   const existing = await request(
@@ -402,28 +422,50 @@ async function main() {
     );
     const prepared = prepareContent(fs.readFileSync(path.resolve(file), "utf8"));
     try {
-      const created = await request(config, "POST", "content", {
-        payload: {
+      const existingPage = await findExistingPage(config, title, spaceKey);
+      let page;
+      let status;
+      let resultParentId;
+      if (existingPage) {
+        const current = await api(config, "GET", existingPage.id);
+        if (!Number.isInteger(current.version?.number)) {
+          throw new Error("Existing Confluence page has no valid version number.");
+        }
+        page = await api(config, "PUT", existingPage.id, {
+          id: existingPage.id,
           type: "page",
           title,
-          ancestors: [{ id: parentId }],
-          space: { key: spaceKey },
-          body: {
-            storage: {
-              value: prepared.storage,
-              representation: "storage",
+          version: { number: current.version.number + 1 },
+          body: { storage: { value: prepared.storage, representation: "storage" } },
+        });
+        status = "updated";
+      } else {
+        const created = await request(config, "POST", "content", {
+          payload: {
+            type: "page",
+            title,
+            ancestors: [{ id: parentId }],
+            space: { key: spaceKey },
+            body: {
+              storage: {
+                value: prepared.storage,
+                representation: "storage",
+              },
             },
           },
-        },
-      });
-      const page = created.data;
+        });
+        page = created.data;
+        status = "created";
+        resultParentId = parentId;
+      }
       for (const diagram of prepared.diagrams) await uploadAttachment(config, page.id, diagram);
       process.stdout.write(
         `${JSON.stringify({
           id: page.id,
           title: page.title,
-          status: "created",
-          parent_id: parentId,
+          version: page.version?.number,
+          status,
+          ...(resultParentId ? { parent_id: resultParentId } : {}),
           url: `${page._links?.base || config.baseUrl}${page._links?.webui || ""}`,
           attached_diagrams: prepared.diagrams.map((diagram) => diagram.filename),
         }, null, 2)}\n`,
