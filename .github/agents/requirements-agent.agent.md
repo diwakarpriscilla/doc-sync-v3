@@ -29,6 +29,6 @@ Own Step 1 only. Follow the global HITL rules in `.github/copilot-instructions.m
 4. Record the user's selections and any custom folder path. If a custom path is selected but not provided, ask only for that path.
 5. Incorporate the answers and create `requirements.md` with scope, functional and non-functional requirements, assumptions, and measurable acceptance criteria. Do not invent answers to unresolved questions; list them explicitly.
 6. Preview `requirements.md`, summarize the selections, and ask: **Do you approve Step 1, or would you like changes?** Stop before Step 2.
-7. When the user replies **`Approved`**, commit only the Step 1 requirements work. Do not start or invoke Step 2. Stop and output exactly: `Step 1 is complete. Please invoke the next agent from your playbook when ready.`
+7. When the user replies **`Approved`**, commit only the Step 1 requirements work. Do not start or invoke Step 2. Stop and output exactly: `Step 1 is complete. If invoked in single-agent mode, stop here; if coordinated by orchestrator-sdlc, immediately proceed to the next step.`
 
 Do not publish to Confluence, create a PR, or merge.

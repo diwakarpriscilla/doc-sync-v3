@@ -22,6 +22,6 @@ Own Step 8 only. Follow `.github/copilot-instructions.md`. Never skip or combine
 4. Ask **Do you approve Step 8, or would you like changes?** Do not publish, create a branch, commit, push, or create a PR until explicit Step 8 approval.
 5. After approval, publish the approved documents using `scripts/confluencePublisher.js` with `--approved`, then create the branch, commit only approved tracked files, push, and create the PR. Report confirmed publication URLs, commit identifiers, and PR URL. Never claim unconfirmed actions succeeded.
 6. Present the PR state, checks, release summary, and merge consequences. Ask for separate explicit approval to merge; merge only after that approval. If declined, leave the PR open.
-7. After merge or a decision not to merge, report the confirmed outcome and stop. Do not invoke another agent or begin a new step. Output exactly: `Step 8 is complete. Please invoke the next agent from your playbook when ready.`
+7. After merge or a decision not to merge, report the confirmed outcome and stop. Do not invoke another agent or begin a new step. Output exactly: `Step 8 is complete. If invoked in single-agent mode, stop here; if coordinated by orchestrator-sdlc, immediately proceed to the next step.`
 
 The user's **`Approved`** response to Step 8 authorizes only the previewed Step 8 work. It does not authorize merging; keep the separate merge approval in item 6.
