@@ -39,6 +39,6 @@ Own Step 7 only. Follow `.github/copilot-instructions.md` and the `gherkin-playw
 3. If `resetDemo.js` or another expected target/fixture is absent, report the check as blocked rather than claiming it passed; request approval before adding a scoped fixture or implementation.
 4. Preview the complete two-part report and the exact Confluence title `[Demo-x] Automated Documentation Sync - QA Test Plan and Execution Summary`, parent page, and source file. Ask **Do you approve Step 7, or would you like changes?** Stop.
 5. When the user replies **`Approved`**, treat that as approval to finish Step 7 and publish the previewed report. Use `scripts/confluencePublisher.js` with `--approved` to create the page under `CONFLUENCE_STORY_PAGE_ID`, using the title `Automated Documentation Sync - QA Test Plan and Execution Summary` and the actual supplied Demo session token (for example `--demo Demo-4`; do not pass the literal `Demo-x`). Report the confirmed page URL. If publication fails, report a sanitized error and do not retry with other credentials.
-6. Commit only Step 7's QA work after successful publication. Do not start or invoke Step 8. Stop and output exactly: `Step 7 is complete. If invoked in single-agent mode, stop here; if coordinated by orchestrator-sdlc, immediately proceed to the next step.`
+6. Commit only Step 7's QA work after successful publication. In single-agent mode, stop after Step 7. Under `orchestrator-sdlc`, immediately start Step 8 in the same chat; do not ask the user to invoke another agent.
 
 Do not create a PR or merge.

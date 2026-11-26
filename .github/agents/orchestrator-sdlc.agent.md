@@ -20,4 +20,4 @@ Coordinate Steps 1 through 8 across specialist agents (`requirements-agent`, `ar
 
 ## Automatic Step Progression (Orchestrator Mode)
 - Unlike single-agent mode, when invoked via `@orchestrator-sdlc`, do NOT ask the user to manually invoke the next agent.
-- Instead, pause for explicit `Approved` sign-off at the end of each step (Steps 1–8), and as soon as the user replies `Approved`, immediately execute the next step in sequence.
+- Instead, pause for explicit `Approved` sign-off at the end of each step (Steps 1–8), and as soon as the user replies `Approved`, immediately execute the next step in sequence in the same chat. Do not ask the user to invoke another agent manually.

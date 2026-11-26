@@ -14,3 +14,4 @@ This project provides a local Node.js Bookstore Catalog Web App (`bookstore-web-
 - **Protected Sections:** Never modify manual notes outside `<!-- DOC-SYNC-START -->` and `<!-- DOC-SYNC-END -->`.
 - **Demo Session Tagging:** Require a `[Demo-x]` session prefix on all Confluence pages, Git branches, and PRs.
 - **Human-in-the-Loop:** Pause at every SDLC checkpoint for explicit user `Approved` sign-off before committing, publishing, or merging.
+- **Orchestrator progression:** When running under `orchestrator-sdlc`, an `Approved` reply immediately starts the next step in sequence in the same chat. Do not tell the user to invoke the next agent manually. Standalone agents still stop after their own step.

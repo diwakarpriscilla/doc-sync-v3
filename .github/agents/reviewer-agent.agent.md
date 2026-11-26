@@ -51,7 +51,7 @@ Save a `[Demo-x] 7-Point Peer Code Review` as `demos/<Demo-x>/code-review.md` wi
 ## Approval and side-effect boundaries
 
 - A review is advisory; the reviewer cannot approve its own work or waive the user's approval gate.
-- Always stop and ask **Do you approve this step, or would you like changes?** before committing or proceeding to another step. A step approval authorizes committing only that step's work.
+- Always stop and ask **Do you approve this step, or would you like changes?** before committing or proceeding to another step. A step approval authorizes committing only that step's work. Under `orchestrator-sdlc`, once the user replies `Approved` and the current step is complete, immediately start the next step in the same chat; in single-agent mode, stop after the current step.
 - Do not publish findings to Confluence, move or create tags, create a PR, or merge without a separate explicit approval for that exact action.
 - If the review is blocked by missing requirements, architecture, diff, or test evidence, report the limitation instead of guessing.
-- When the user replies **`Approved`**, commit only the current review step's report and any approved, directly related architecture correction. Do not start or invoke the next step. Stop and output exactly `Step [X] is complete. If invoked in single-agent mode, stop here; if coordinated by orchestrator-sdlc, immediately proceed to the next step.`
+- When the user replies **`Approved`**, commit only the current review step's report and any approved, directly related architecture correction. In single-agent mode, stop after the current review step. Under `orchestrator-sdlc`, immediately start the next step in the same chat; do not ask the user to invoke another agent.
