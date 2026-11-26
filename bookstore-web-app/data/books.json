@@ -19,13 +19,5 @@
     "category": "Creativity",
     "color": "#c8d4d7",
     "textColor": "#17211b"
-  },
-  {
-    "title": "The Pragmatic Programmer",
-    "author": "Andrew Hunt and David Thomas",
-    "category": "Programming",
-    "color": "#aebd9d",
-    "textColor": "#17211b",
-    "isNewArrival": true
   }
 ]
