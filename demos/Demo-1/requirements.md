@@ -13,7 +13,7 @@ The repository context includes `./bookstore-web-app`, existing marker-based `RE
 - **In scope:** Automatic creation of missing `README.md` or `API_DOCS.md` files, updates only inside valid DOC-SYNC marker pairs, secret redaction, and a clear console report.
 - **Out of scope:** Architecture, implementation, test execution, release documentation, Confluence publication, pull requests, merges, and code changes. These belong to later SDLC steps.
 
-Human selections:
+User-confirmed selections:
 
 1. **Target Project Folder:** Option A — `./bookstore-web-app`.
 2. **Missing Documentation Files:** Option A — create missing `README.md` and `API_DOCS.md` automatically.
