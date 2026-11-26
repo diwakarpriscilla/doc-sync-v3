@@ -1,0 +1,19 @@
+{
+	"mcpServers": {
+		"confluence": {
+			"type": "stdio",
+			"command": "node",
+			"args": [
+				"confluencePublisher.js"
+			],
+			"tools": [
+				"*"
+			],
+			"env": {
+				"CONFLUENCE_URL": "${CONFLUENCE_URL}",
+				"CONFLUENCE_EMAIL": "${CONFLUENCE_EMAIL}",
+				"CONFLUENCE_API_TOKEN": "${CONFLUENCE_API_TOKEN}"
+			}
+		}
+	}
+}
