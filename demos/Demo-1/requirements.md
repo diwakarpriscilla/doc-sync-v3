@@ -6,57 +6,60 @@ As a Backend Engineering Lead, I want an automated CLI tool that scans JavaScrip
 
 ## Scope
 
-- Implement a local Node.js CLI that scans `.js` files in a selected target folder.
-- Use `./bookstore-web-app` as the default target and allow a custom folder path.
-- Extract exported functions, JSDoc comments, and HTTP API endpoints using `GET`, `POST`, `PUT`, and `DELETE`.
-- Update `README.md` and `API_DOCS.md` in the selected target folder while preserving human-written content outside the generated section.
-- Automatically create either documentation file when it is missing.
-- Redact values for `DB_PASSWORD`, `JWT_SECRET`, and `API_TOKEN`.
-- Report scanned files and updated documentation sections, and safely handle missing or empty target folders.
+- Build a local Node.js CLI for the demo repository's `./bookstore-web-app` project.
+- Scan JavaScript source files in the selected target folder and extract exported functions, JSDoc comments, and HTTP endpoints using `GET`, `POST`, `PUT`, and `DELETE`.
+- Update or create `README.md` and `API_DOCS.md` for the target project.
+- Preserve human-written content outside `<!-- DOC-SYNC-START -->` and `<!-- DOC-SYNC-END -->`.
+- Detect and redact passwords and API keys in documentation output and console reporting, using `[REDACTED]`.
+- Report scanned files, updated sections, missing folders, and empty folders safely.
+- Leave this work at the requirements stage; architecture, implementation, QA, publication, PR, and merge steps are out of scope for Step 1.
 
 ## Functional Requirements
 
-- **FR-1 — Target selection:** When no target path is supplied, scan `./bookstore-web-app`. Accept a supplied custom target path.
-- **FR-2 — Source discovery:** Scan `.js` files in the selected target folder. Whether discovery is recursive remains an open question.
-- **FR-3 — API and code extraction:** Extract exported functions, their JSDoc comments, and HTTP endpoints for `GET`, `POST`, `PUT`, and `DELETE`.
-- **FR-4 — Documentation outputs:** Update `README.md` and `API_DOCS.md` inside the selected target folder.
-- **FR-5 — Preserve human-authored text:** For an existing document containing `<!-- DOC-SYNC-START -->` and `<!-- DOC-SYNC-END -->`, update generated content only between those markers and leave content outside them unchanged.
-- **FR-6 — Create missing documents:** If either output document is absent, create it with a starter title and a generated-content marker pair.
-- **FR-7 — Redact sensitive values:** Before writing generated documentation or printing report output, replace values associated with `DB_PASSWORD`, `JWT_SECRET`, or `API_TOKEN` with `[REDACTED]`.
-- **FR-8 — Report results:** Print a clear console report identifying scanned files and updated documentation sections.
-- **FR-9 — Handle target-folder conditions:** Handle missing or empty target folders safely and report the condition clearly.
+- **FR-1 — Target selection:** Use `./bookstore-web-app` as the target project folder; do not use a custom folder unless one is later supplied and recorded.
+- **FR-2 — Source discovery:** Scan `.js` files in the selected target folder. Nested-folder recursion is unresolved.
+- **FR-3 — Code extraction:** Extract exported JavaScript functions and JSDoc comments from scanned source files.
+- **FR-4 — Endpoint extraction:** Extract `GET`, `POST`, `PUT`, and `DELETE` HTTP API endpoints.
+- **FR-5 — Documentation update:** Update generated content in `README.md` and `API_DOCS.md` for the target project.
+- **FR-6 — Manual-note protection:** When both DOC-SYNC markers exist, change only text between them and leave all text outside them unchanged.
+- **FR-7 — Missing documentation:** If `README.md` or `API_DOCS.md` is missing, create the file automatically with a generated-content section.
+- **FR-8 — Secret protection:** Replace password and API-key values with `[REDACTED]` before writing documentation or printing a console report. Repository guidance specifically protects `STORE_ADMIN_KEY`, `DB_PASSWORD`, `JWT_SECRET`, and `API_TOKEN`.
+- **FR-9 — Console reporting:** Report scanned files and documentation sections updated or skipped.
+- **FR-10 — Folder safety:** Handle missing or empty target folders without an unhandled exception.
 
 ## Non-Functional Requirements
 
-- **NFR-1 — Local execution:** Implement the CLI in Node.js and support local execution.
-- **NFR-2 — Data protection:** Never print or store the original values of the specified sensitive keys in generated documentation or CLI report output.
-- **NFR-3 — Safe updates:** Avoid leaving partially written documentation if scanning or generation fails.
+- **NFR-1 — Local execution:** The CLI is implemented in Node.js and runs locally.
+- **NFR-2 — Data protection:** Original secret values are not written to documentation or emitted by the CLI report.
+- **NFR-3 — Update safety:** A file update must not leave the documentation partially written when processing or writing fails.
+- **NFR-4 — Traceability:** Generated results and acceptance evidence must be traceable to the functional requirements.
 
 ## Assumptions
 
-- The selected folder contains the project source files and the two documentation outputs.
-- The default target is `./bookstore-web-app`; users may provide a custom folder path.
-- Missing `README.md` or `API_DOCS.md` files are created automatically with a starter title and marker pair.
-- Existing human-written content is protected by limiting generated-content changes to the marker range.
-- The user selected option A for each standardized question: default Bookstore Web App target, create missing documentation files, update only between markers, and redact sensitive values.
+- For Demo-1, the target project is `./bookstore-web-app`.
+- Missing `README.md` or `API_DOCS.md` files will be created automatically.
+- Existing content outside valid DOC-SYNC marker pairs is human-authored and must remain unchanged.
+- Passwords and API keys found in generated output or console reporting will be redacted as `[REDACTED]`.
+- The repository may contain live source and existing documentation; no external service other than local Confluence story discovery is used during Step 1.
 
 ## Acceptance Criteria
 
-- **AC-1 (FR-1):** Invoking the CLI without a target path selects `./bookstore-web-app`; invoking it with a custom path selects that folder.
-- **AC-2 (FR-2, FR-8):** The CLI scans `.js` files in the selected folder and identifies the processed files in its report.
-- **AC-3 (FR-3, FR-4):** Generated documentation includes discovered exported functions, JSDoc comments, and endpoints using `GET`, `POST`, `PUT`, and `DELETE` in the selected folder's `README.md` and `API_DOCS.md`.
-- **AC-4 (FR-5):** For each existing output file with a valid marker pair, content before and after the pair remains unchanged after an update.
-- **AC-5 (FR-6):** If either output file is absent, the CLI creates it with a starter title and exactly one valid generated-content marker pair.
-- **AC-6 (FR-7, NFR-2):** Values associated with `DB_PASSWORD`, `JWT_SECRET`, and `API_TOKEN` do not appear in generated documentation or report output; their documented representation is `[REDACTED]`.
-- **AC-7 (FR-8):** The report identifies scanned files and the documentation sections updated.
-- **AC-8 (FR-9):** For a missing or empty target folder, the CLI reports the condition without an unhandled exception.
-- **AC-9 (NFR-1):** The CLI can be run locally with Node.js.
-- **AC-10 (NFR-3):** If scanning or generation fails, neither documentation output is left partially written.
+- **AC-1 (FR-1):** Running the CLI without a target path resolves `./bookstore-web-app`; any later custom path is used only after it is explicitly supplied and recorded.
+- **AC-2 (FR-2, FR-9):** The CLI produces a successful run report naming each `.js` file scanned, or a clear report naming why no files could be scanned.
+- **AC-3 (FR-3, FR-4, FR-5):** Generated documentation contains each discovered exported function, JSDoc comment, and endpoint using `GET`, `POST`, `PUT`, or `DELETE`, or records an explicit no-items-found result.
+- **AC-4 (FR-6):** In a file with a valid marker pair, a 100% byte comparison shows text before the start marker and text after the end marker remains unchanged.
+- **AC-5 (FR-7):** For each missing output file, the CLI creates that file during the same run and includes exactly one valid DOC-SYNC marker pair.
+- **AC-6 (FR-8, NFR-2):** `STORE_ADMIN_KEY`, `DB_PASSWORD`, `JWT_SECRET`, and `API_TOKEN` values do not appear in generated documentation or CLI report output; their displayed representation is `[REDACTED]`.
+- **AC-7 (FR-9):** The report identifies the set of files scanned and each documentation section created or updated.
+- **AC-8 (FR-10):** A missing or empty target folder produces a clear report and no unhandled exception.
+- **AC-9 (NFR-1):** The CLI completes a basic run using the repository's Node.js runtime.
+- **AC-10 (NFR-3):** If processing or writing fails, all documentation outputs remain byte-for-byte unchanged.
+- **AC-11 (NFR-4):** Each acceptance criterion is mapped to at least one requirement ID and each functional requirement has at least one mapped acceptance criterion.
 
 ## Open Questions
 
-- Should `.js` discovery include nested subfolders or only files directly in the target folder?
-- If an existing documentation file lacks one or both generated-content markers, should the CLI skip it with a warning or add a marker section?
-- What exact JSDoc fields and endpoint metadata should the generated sections contain?
-- How should the CLI identify sensitive values in source files (for example, assignment syntax, quoted values, or values loaded from environment variables), and should redaction cover other secret key names beyond the three specified?
-- Should an empty target folder be treated as a successful no-op with a report, or as a non-zero CLI result?
+- Should `.js` discovery include nested subfolders or only files directly in `./bookstore-web-app`?
+- If an existing documentation file lacks one or both DOC-SYNC markers, should it be skipped with a warning or should a marker pair be added?
+- What exact JSDoc fields and endpoint metadata must appear in generated sections?
+- How should secret values be detected, and should redaction extend beyond the four repository-listed key names?
+- Should an empty target folder be a successful no-op or return a non-zero CLI exit status?
