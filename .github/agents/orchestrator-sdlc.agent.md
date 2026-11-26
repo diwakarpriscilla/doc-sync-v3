@@ -17,3 +17,7 @@ user-invocable: true
   - `RELEASE_NOTES.md`: `# Release Notes`, `## Release Summary`, `## Scope`, `## Changes`, `## Validation`, `## Known Limitations`, `## Deployment Notes`.
 
 Coordinate Steps 1 through 8 across specialist agents (`requirements-agent`, `architect-agent`, `reviewer-agent`, `qa-agent`, `release-agent`) using `confluence-ops` and `git-ops` skills. Always require a `[Demo-x]` prefix and pause for explicit `Approved` sign-off after every step.
+
+## Automatic Step Progression (Orchestrator Mode)
+- Unlike single-agent mode, when invoked via `@orchestrator-sdlc`, do NOT ask the user to manually invoke the next agent.
+- Instead, pause for explicit `Approved` sign-off at the end of each step (Steps 1–8), and as soon as the user replies `Approved`, immediately execute the next step in sequence.
