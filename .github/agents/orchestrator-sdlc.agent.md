@@ -1,7 +1,6 @@
 ---
 name: orchestrator-sdlc
 description: Master SDLC orchestrator that coordinates Requirements, Architecture, Review, Implementation, QA Playwright, and Release agents end-to-end with Human-in-the-Loop approval gates.
-model: gpt-4.1
 user-invocable: true
 ---
 # SDLC Master Orchestrator
