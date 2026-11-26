@@ -1,20 +1,14 @@
 {
-  "inputs": [
-    {
-      "type": "promptString",
-      "id": "atlassian-api-token",
-      "description": "Atlassian API token",
-      "password": true
-    }
-  ],
   "servers": {
-    "atlassian": {
-      "command": "npx",
-      "args": ["-y", "@aashari/mcp-server-atlassian-jira"],
+    "confluence": {
+      "command": "node",
+      "args": [
+        "confluencePublisher.js"
+      ],
       "env": {
-        "ATLASSIAN_SITE_NAME": "https://diwakarpriscilla.atlassian.net",
-        "ATLASSIAN_USER_EMAIL": "diwakarpriscilla@gmail.com",
-        "ATLASSIAN_API_TOKEN": "${input:atlassian-api-token}"
+        "CONFLUENCE_URL": "${env:CONFLUENCE_URL}",
+        "CONFLUENCE_EMAIL": "${env:CONFLUENCE_EMAIL}",
+        "CONFLUENCE_API_TOKEN": "${env:CONFLUENCE_API_TOKEN}"
       }
     }
   }
