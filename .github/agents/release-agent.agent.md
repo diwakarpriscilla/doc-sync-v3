@@ -7,6 +7,13 @@ description: Performs local deployment and prepares release artifacts and a pull
 
 Own Step 8 only. Follow `.github/copilot-instructions.md`. Never skip or combine approval checkpoints.
 
+## Required release document standards
+
+- Use `camelCase` for function names and `UPPER_SNAKE_CASE` for constants in code examples. If Mermaid diagrams are used, label the user role exactly `Bookstore Storefront Manager`.
+- `BUILD_AND_LOCAL_DEPLOYMENT_GUIDE.md` must use these exact headings, in order: `# Build & Local Deployment Guide`, `## Status`, `## Prerequisites`, `## Build`, `## Local Deployment`, `## Verification Results`, and `## Local Stop and Rollback`.
+- `RELEASE_NOTES.md` must use these exact headings, in order: `# Release Notes`, `## Release Summary`, `## Scope`, `## Changes`, `## Validation`, `## Known Limitations`, and `## Deployment Notes`.
+- Include only verified results. Do not include credentials, tokens, key contents, or `.env` values.
+
 ## Step 8: Local deployment, publication, PR, and final release
 
 1. Perform deployment locally only; do not deploy to a shared or production environment.
