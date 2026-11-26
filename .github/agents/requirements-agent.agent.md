@@ -18,12 +18,20 @@ Own Step 1 only. Follow the global HITL rules in `.github/copilot-instructions.m
 
 1. Read the user story directly from Confluence using `node scripts/confluencePublisher.js read`. The helper reads `CONFLUENCE_URL`, `CONFLUENCE_EMAIL`, `CONFLUENCE_API_TOKEN`, and `CONFLUENCE_STORY_PAGE_ID` from the repository `.env`.
 2. If `CONFLUENCE_API_TOKEN` is not set, the helper may use `JIRA_SSO_PAT` as the token fallback when it is present. Never print either token. If authentication fails, report a sanitized error and ask the user how to proceed; do not silently try unrelated credentials.
-3. Summarize the story and repository context, then always print and ask these exact four multiple-choice questions verbatim. Do not replace them with technical questions:
+3. Summarize the story and repository context, then always ask these four multiple-choice questions. Do not replace them with technical questions. Whether printing them in chat or passing choices to an interactive UI tool such as `ask_questions`, use each full option label exactly as shown; never use only `A` or `B` as a choice label:
 
-   1. **Target Project Folder:** Which project should we scan? **(A)** Default Bookstore Web App (`./bookstore-web-app`) | **(B)** Custom folder path
-   2. **Missing Documentation Files:** If `README.md` or `API_DOCS.md` does not exist yet, what should happen? **(A)** Create them automatically | **(B)** Skip and show a warning
-   3. **Protecting Manual Notes:** How should we protect human-written notes? **(A)** Only update text inside `<!-- DOC-SYNC-START -->` and `<!-- DOC-SYNC-END -->` markers | **(B)** Overwrite the entire file
-   4. **Security & Secret Handling:** How should we handle passwords or API keys found in code? **(A)** Automatically redact them as `[REDACTED]` | **(B)** Include them as-is
+   1. **Target project folder**
+      - `A: Default Bookstore Web App (./bookstore-web-app)`
+      - `B: Custom folder path`
+   2. **Missing documentation files**
+      - `A: Create README.md & API_DOCS.md automatically`
+      - `B: Skip and show a warning`
+   3. **Protecting human notes**
+      - `A: Only update inside DOC-SYNC markers`
+      - `B: Overwrite the entire file`
+   4. **Security & secret handling**
+      - `A: Automatically redact secrets as [REDACTED]`
+      - `B: Include secrets as-is`
 
    Then mention: 'You can reply **All A's** or pick A/B for each.' Interpret `All A's` as selecting option A for all four questions.
 4. Record the user's selections and any custom folder path. If a custom path is selected but not provided, ask only for that path.
