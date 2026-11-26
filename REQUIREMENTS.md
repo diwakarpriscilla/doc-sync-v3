@@ -1,69 +1,87 @@
-# [Demo-5] Automated Documentation Sync Requirements
+# Automated Documentation Sync Requirements
 
-## User story
+## Story Summary
 
-As a Backend Engineering Lead, I want an automated CLI tool that scans JavaScript/Node.js route and service files and updates `API_DOCS.md` and `README.md`, so that endpoint documentation stays accurate after code changes without manual editing.
+**User Story:** As a Backend Engineering Lead, I want an automated CLI tool that scans JavaScript/Node.js route and service files and updates `API_DOCS.md` and `README.md`, so that the team's endpoint documentation remains accurate after code changes without manual editing.
+
+**Source:** Confluence page `8454160`, “User Story: Automated Documentation Sync (Bookstore API)”, read successfully at Step 1.
+
+## Repository Context
+
+- The repository contains a dependency-light Node.js bookstore catalog application in `./bookstore-web-app`.
+- `docSync.js` provides recursive JavaScript discovery, endpoint/function extraction, marker-based documentation updates, and secret redaction.
+- `README.md` and `API_DOCS.md` already exist in the default target folder.
+- Existing unit tests cover scanning, marker preservation, missing-document creation, secret redaction, and missing/empty folders.
 
 ## Scope
 
-Build a Node.js CLI that:
+Implement or complete the automated documentation synchronization CLI for the selected project folder. The tool will:
 
-- Scans a selected project folder for JavaScript files.
-- Extracts exported functions, JSDoc comments, and HTTP API endpoints.
-- Updates `README.md` and `API_DOCS.md`.
-- Preserves human-authored content outside generated sections.
-- Redacts sensitive values before writing or displaying report information.
+- Recursively scan JavaScript files.
+- Extract exported functions, JSDoc summaries and metadata, and supported HTTP endpoints.
+- Generate or refresh `README.md` and `API_DOCS.md`.
+- Produce a clear console report.
+- Handle missing and empty folders safely.
 
-## Selected decisions
+Out of scope for Step 1: implementation, Confluence publication, pull requests, deployments, commits, and later SDLC steps.
 
-1. **Target project folder:** Use `./bookstore-web-app` by default.
-2. **Missing documentation:** Automatically create `README.md` and `API_DOCS.md` when absent.
-3. **Manual notes:** Update only content between `<!-- DOC-SYNC-START -->` and `<!-- DOC-SYNC-END -->`; preserve content outside the marker pair.
-4. **Security:** Redact passwords and API keys as `[REDACTED]`.
+## Selected Decisions
 
-## Functional requirements
+The four standardized selections default to option A as explicitly directed:
 
-1. Use `./bookstore-web-app` when no target folder is supplied.
-2. Accept a custom target folder supplied by the user.
-3. Scan `.js` files in the selected target folder, including nested project folders.
-4. Extract exported functions, JSDoc comments, and HTTP endpoints that use `GET`, `POST`, `PUT`, and `DELETE`.
-5. Generate deterministic documentation sections for discovered functions and endpoints.
-6. Update `README.md` and `API_DOCS.md` only inside valid `<!-- DOC-SYNC-START -->` / `<!-- DOC-SYNC-END -->` marker pairs.
-7. Preserve all bytes outside a valid marker pair.
-8. If `README.md` or `API_DOCS.md` is missing, create the file automatically with a project title and a valid marker pair.
-9. Redact passwords and API keys, including values for names such as `DB_PASSWORD`, `JWT_SECRET`, and `API_TOKEN`, before writing documentation or producing console output.
-10. Print a clear report that identifies scanned files and the documentation sections updated or skipped.
-11. Handle missing, empty, or unreadable target folders safely and return a clear non-zero or reported failure as appropriate.
+1. **Target Project Folder:** Option A — scan the Default Bookstore Web App at `./bookstore-web-app`.
+2. **Missing Documentation Files:** Option A — automatically create `README.md` and `API_DOCS.md` if absent.
+3. **Protecting Manual Notes:** Option A — update only content inside `<!-- DOC-SYNC-START -->` and `<!-- DOC-SYNC-END -->` markers.
+4. **Security & Secret Handling:** Option A — replace passwords and API keys with `[REDACTED]`.
 
-## Non-functional requirements
+These are assumptions, not user-specific custom choices.
 
-1. The CLI must run locally with Node.js.
-2. Documentation output must be deterministic when source inputs are unchanged.
-3. Scanning or generation failures must not leave partially written documentation.
-4. Secrets must not be written to documentation or printed in console output.
-5. Existing repository behavior outside the requested implementation must remain unchanged.
+## Functional Requirements
+
+1. The CLI shall use `./bookstore-web-app` as the target folder when no custom folder is supplied.
+2. The CLI shall recursively discover files ending in `.js`, excluding `.git` and `node_modules`.
+3. The CLI shall extract exported functions and JSDoc descriptions, parameters, and return values.
+4. The CLI shall extract Express-style routes and equivalent `request.method`/`url.pathname` endpoint patterns.
+5. The CLI shall support `GET`, `POST`, `PUT`, and `DELETE` methods.
+6. The CLI shall generate deterministic Markdown documentation for discovered functions and endpoints.
+7. The CLI shall refresh only content bounded by a valid start/end marker pair.
+8. The CLI shall preserve all content outside valid marker pairs.
+9. If a selected documentation file is missing, the CLI shall create it with a title and valid marker pair.
+10. If an existing documentation file lacks valid markers, the CLI shall skip it and report the skip.
+11. The CLI shall redact sensitive values such as `DB_PASSWORD`, `JWT_SECRET`, and `API_TOKEN` before writing documentation or printing CLI output.
+12. The CLI shall report the number and names of scanned JavaScript files and the created, updated, or skipped documentation sections.
+13. The CLI shall handle a missing or empty target folder without an unhandled stack trace.
+
+## Non-Functional Requirements
+
+1. The tool shall run locally with Node.js.
+2. Output shall be deterministic for unchanged source inputs.
+3. Documentation writes shall avoid partial marker-section updates.
+4. Secrets shall not be retained in source updates, generated files, logs, reports, or console output.
+5. Existing application behavior outside documentation synchronization shall remain unchanged.
 
 ## Assumptions
 
 - Documentation files are located in the selected target folder.
-- A missing documentation file may be initialized with the project folder name as the title.
-- Existing documentation files without a valid marker pair are not overwritten and are reported as skipped.
-- Endpoint metadata is represented in a human-readable Markdown list.
+- A missing documentation file may be initialized with a Markdown title and a valid DOC-SYNC marker pair.
+- Existing files without valid marker pairs are protected and will not be overwritten.
+- The default target is `./bookstore-web-app`.
+- Sensitive environment-key values shall be represented as `[REDACTED]`.
 
-## Open questions
+## Open Questions
 
-1. None of the four requirements selections remain unresolved.
-2. The exact JSDoc fields to extract beyond descriptions, parameters, and return values are not specified by the story.
+- None of the four standardized selections remains unresolved because option A was selected explicitly as the default.
+- The story does not specify additional JSDoc fields beyond descriptions, parameters, and return values.
 
-## Measurable acceptance criteria
+## Measurable Acceptance Criteria
 
-1. Running the CLI without a folder argument scans `./bookstore-web-app`.
-2. Supplying a custom folder path causes that folder to be used instead.
-3. JavaScript `.js` files in the selected folder and nested folders are reported as scanned.
-4. Generated documentation identifies discovered exported functions and JSDoc details.
-5. Generated documentation identifies discovered `GET`, `POST`, `PUT`, and `DELETE` endpoints.
-6. For a valid marker pair, bytes before the start marker and after the end marker remain unchanged.
-7. A missing `README.md` or `API_DOCS.md` is created with a starter title and valid marker pair.
-8. Password and API-key values do not appear in generated documentation or console output and are represented as `[REDACTED]`.
-9. A missing or empty target folder produces a clear report and does not cause an unhandled exception.
-10. The console report names each scanned file and each documentation section updated or skipped.
+1. With no folder argument, the CLI scans `./bookstore-web-app`.
+2. Every nested `.js` file in the target is discovered unless it is under `.git` or `node_modules`.
+3. Exported functions and JSDoc metadata are represented in generated API documentation.
+4. `GET`, `POST`, `PUT`, and `DELETE` endpoints are represented with their method and path.
+5. Updating a marked file leaves text before the start marker and after the end marker byte-for-byte unchanged.
+6. A missing `README.md` or `API_DOCS.md` is created with a title and a valid marker pair.
+7. An existing file without valid markers is skipped and named in the console report.
+8. `DB_PASSWORD`, `JWT_SECRET`, `API_TOKEN`, and their values do not appear in generated documentation or console output.
+9. A missing or empty target folder produces a clear report and exits without an unhandled exception.
+10. The console report identifies scanned files and each documentation file as created, updated, or skipped.
